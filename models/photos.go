@@ -1,15 +1,21 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"github.com/asaskevich/govalidator"
+	"gorm.io/gorm"
+)
 
 type Photos struct {
 	gorm.Model
-	ID       int    `gorm:"primarykey;AUTO_INCREMENT" json:"id" form:"id"`
-	Title    string `json:"title" form:"title" valid:"required"`
+	// ID       int    `gorm:"primarykey;AUTO_INCREMENT" json:"id" form:"id"`
+	Title    string `gorm:"not null" json:"title" form:"title" valid:"required"`
 	Caption  string `json:"caption" form:"caption"`
-	PhotoUrl string `json:"photo_url" form:"photo_url"`
-	// UserID   User   `json:"user_id" form:"user_id"`
-	User []User `json:"user" gorm:"foreignKey:UserID"`
+	PhotoUrl string `gorm:"not null" json:"photo_url" form:"photo_url"`
+	// UserID   uint   `json:"user_id"`
+	User   *User
+	UserID uint `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"user_id"`
+
+	// User []User `json:"user,omitempty" gorm:"foreignKey:ID"`
 }
 
 type Photos_Resp struct {
@@ -36,4 +42,28 @@ type Photos_update struct {
 	Title    string `json:"title" validate:"required"`
 	Caption  string `json:"caption" validate:"required"`
 	PhotoUrl string `json:"photo_url" validate:"required"`
+}
+
+func (p *Photos) BeforeCreate(tx *gorm.DB) (err error) {
+	_, errCreate := govalidator.ValidateStruct(p)
+
+	if errCreate != nil {
+		err = errCreate
+		return
+	}
+
+	err = nil
+	return
+}
+
+func (p *Photos) BeforeUpdate(tx *gorm.DB) (err error) {
+	_, errCreate := govalidator.ValidateStruct(p)
+
+	if errCreate != nil {
+		err = errCreate
+		return
+	}
+
+	err = nil
+	return
 }

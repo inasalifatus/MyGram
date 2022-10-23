@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"log"
 	"mygram/models"
 
 	"gorm.io/driver/mysql"
@@ -31,12 +32,20 @@ func InitDB() {
 	var e error
 	DB, e = gorm.Open(mysql.Open(connectionString), &gorm.Config{})
 	if e != nil {
-		panic(e)
+		log.Fatal("error connecting to database:", e)
 	}
+	// DB.Debug().AutoMigrate(models.User{}, models.Photos{})
 	InitMigrate()
 }
 
 func InitMigrate() {
 	DB.AutoMigrate(&models.User{})
 	DB.AutoMigrate(&models.Photos{})
+	DB.AutoMigrate(&models.Comment{})
+	DB.AutoMigrate(&models.Sosmed{})
+
+}
+
+func GetDB() *gorm.DB {
+	return DB
 }

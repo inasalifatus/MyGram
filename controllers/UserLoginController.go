@@ -13,9 +13,8 @@ import (
 func LoginUserController(ctx *gin.Context) {
 	user := models.User{}
 	contentType := helpers.GetContentType(ctx)
-	_, _ = user, contentType
+	// _, _ = user, contentType
 	ctx.Bind(&user)
-	password := ""
 
 	if contentType == constants.APPJSON {
 		ctx.ShouldBindJSON(&user)
@@ -23,7 +22,7 @@ func LoginUserController(ctx *gin.Context) {
 		ctx.ShouldBind(&user)
 	}
 
-	password = user.Password
+	password := user.Password
 
 	// users, err := database.LoginUser(&user)
 	err := config.DB.Debug().Where("email = ?", user.Email).Take(&user).Error
@@ -43,8 +42,17 @@ func LoginUserController(ctx *gin.Context) {
 		return
 	}
 	token := helpers.GenerateToken(user.ID, user.Email)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, map[string]interface{}{
+			"code":    400,
+			"message": "Error invalid JWT",
+			"status":  "Error",
+		})
+		return
+	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"status": "success",
 		"token":  token,
 	})
+	return
 }

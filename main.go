@@ -7,6 +7,7 @@ import (
 
 func main() {
 	config.InitDB()
+	config.GetDB()
 
 	routers.StartServer().Run(":9999")
 }

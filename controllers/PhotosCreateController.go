@@ -1,31 +1,30 @@
 package controllers
 
 import (
+	"mygram/constants"
+	"mygram/helpers"
 	"mygram/lib/database"
 	"mygram/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 )
 
 func CreatePhotosController(ctx *gin.Context) {
-	var body models.Photos_post
+	userData := ctx.MustGet("userData").(jwt.MapClaims)
+	contentType := helpers.GetContentType(ctx)
+	Photos := models.Photos{}
+	userID := uint(userData["id"].(float64))
+	Photos.UserID = userID
 
-	if e := ctx.Bind(&body); e != nil {
-		ctx.JSON(http.StatusBadRequest, map[string]interface{}{
-			"code":    400,
-			"status":  "error",
-			"message": e.Error(),
-		})
-		return
+	if contentType == constants.APPJSON {
+		ctx.ShouldBindJSON((&Photos))
+	} else {
+		ctx.ShouldBind(&Photos)
 	}
 
-	var photos models.Photos
-	photos.Title = body.Title
-	photos.Caption = body.Caption
-	photos.PhotoUrl = body.PhotoUrl
-
-	_, err := database.InsertPhoto(photos)
+	_, err := database.InsertPhoto(Photos)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
@@ -38,6 +37,6 @@ func CreatePhotosController(ctx *gin.Context) {
 		Code:    201,
 		Status:  "Success",
 		Message: "Success create photo",
-		Data:    photos,
+		Data:    Photos,
 	})
 }

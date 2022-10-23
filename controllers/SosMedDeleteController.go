@@ -33,7 +33,7 @@ func DeleteSosMedController(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, map[string]interface{}{
 		"code":    200,
 		"status":  "success",
-		"message": "comment successfully deleted",
+		"message": "sosmed successfully deleted",
 	})
 
 }

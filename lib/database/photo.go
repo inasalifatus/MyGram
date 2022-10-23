@@ -37,7 +37,7 @@ func GetPhotoById(id int) (models.Photos, error) {
 func DeletePhotoById(id int) error {
 	rows := config.DB.Delete(&models.Photos{}, id).RowsAffected
 	if rows == 0 {
-		err := errors.New("categories to be deleted is not found")
+		err := errors.New("photo to be deleted is not found")
 		return err
 	}
 	return nil

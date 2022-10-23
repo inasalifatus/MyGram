@@ -36,7 +36,7 @@ func CreateSosMedController(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, models.Sosmed_response_single{
 		Code:    201,
 		Status:  "Success",
-		Message: "Success create photo",
+		Message: "Success create social media",
 		Data:    sosmed,
 	})
 

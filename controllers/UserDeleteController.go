@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"fmt"
-	"mygram/models"
+	"mygram/lib/database"
+	"mygram/lib/utils"
 	"net/http"
 	"strconv"
 
@@ -10,34 +10,33 @@ import (
 )
 
 func DeleteUserController(ctx *gin.Context) {
-	ID := ctx.Param("ID")
-	intID, _ := strconv.Atoi(ID)
-	condition := false
-	var userIndex int
-	// var user models.User
-	var UserData = []models.User{}
+	//
+	id, _ := strconv.Atoi(ctx.Param("id"))
 
-	for i, user := range UserData {
-		if intID == user.ID {
-			condition = true
-			userIndex = i
-			break
-		}
+	if !utils.StringIsNotNumber(ctx.Param("id")) {
+		ctx.JSON(http.StatusBadRequest, map[string]interface{}{
+			"code":    400,
+			"status":  "Fail",
+			"message": "invalid id supplied",
+		})
+
+		return
 	}
 
-	if !condition {
-		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
-			"error":   "Data Not Found",
-			"message": fmt.Sprintf("user with id %v not found", intID),
+	err := database.DeleteUserById(id)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, map[string]interface{}{
+			"code":    404,
+			"status":  "Fail",
+			"message": err.Error(),
 		})
 		return
 	}
 
-	copy(UserData[userIndex:], UserData[userIndex+1:])
-	UserData[len(UserData)-1] = models.User{}
-	UserData = UserData[:len(UserData)-1]
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": fmt.Sprintf("user with id %v has been successfully updated", intID),
+	ctx.JSON(http.StatusOK, map[string]interface{}{
+		"code":    200,
+		"status":  "success",
+		"message": "Your account has been succesfully deleted",
 	})
+	return
 }

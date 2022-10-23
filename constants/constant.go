@@ -1,6 +1,6 @@
 package constants
 
 const (
-	SECRET_JWT = "legal"
+	SECRET_JWT = "rahasia"
 	APPJSON    = "application/json"
 )
